@@ -12,6 +12,7 @@ import Register from "./components/Register.jsx";
 import MyBids from "./components/MyBids.jsx";
 import MyProducts from "./components/MyProducts.jsx";
 import Login from "./components/Login.jsx";
+import ProductDetails from "./components/ProductDetails.jsx";
 
 let router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ let router = createBrowserRouter([
       {
         path: "/my-products",
         Component: MyProducts,
+      },
+      {
+        path: "/product-details/:id",
+        Component: ProductDetails,
       },
     ],
   },

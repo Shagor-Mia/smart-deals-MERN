@@ -5,6 +5,18 @@
 @plugin "daisyui/theme" {
   name: "light";
   default: true;
-  --color-primary: blue;
+  --color-primary: #632ee3;
   --color-secondary: teal;
+}
+
+/* Override DaisyUI btn-primary */
+.btn-primary {
+  background-image: linear-gradient(to right, #632ee3, #9f62f2);
+  border: none;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-image: linear-gradient(to right, #9f62f2, #632ee3);
+  opacity: 0.9;
 }
