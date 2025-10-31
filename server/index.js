@@ -33,7 +33,25 @@ async function run() {
     await client.connect();
     const db = client.db("smart-dealsDB");
     const productCollections = db.collection("Products");
+    const bidsCollections = db.collection("bids");
+    const usersCollections = db.collection("Users");
 
+    // users
+    app.post("/users", async (req, res) => {
+      const newUser = req.body;
+      const email = req.body.email;
+      const query = { email: email };
+
+      const existingUser = await usersCollections.findOne(query);
+      if (existingUser) {
+        res.send("User already exist!");
+      } else {
+        const result = await usersCollections.insertOne(newUser);
+        res.send(result);
+      }
+    });
+
+    // products
     app.get("/products", async (req, res) => {
       //   const projectField = { title: 1, price_min: 1, price_max: 1 };
       //   const cursor = productCollections
@@ -85,6 +103,18 @@ async function run() {
       };
       const options = {};
       const result = await productCollections.updateOne(query, update, options);
+      res.send(result);
+    });
+
+    // bids
+    app.get("/bids", async (req, res) => {
+      const email = req.query.email;
+      const query = {};
+      if (email) {
+        query.buyer_email = email;
+      }
+      const cursor = bidsCollections.find(query);
+      const result = await cursor.toArray();
       res.send(result);
     });
 
