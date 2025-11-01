@@ -6,8 +6,7 @@ const app = express();
 
 // TVAX4rBHFLzodpC9
 
-const uri =
-  "mongodb+srv://ProgrammingHero:TVAX4rBHFLzodpC9@cluster0.5pkif.mongodb.net/hero_start54";
+const uri = process.env.URL;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -82,7 +81,7 @@ async function run() {
 
     app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
+      const query = { _id: id };
       const result = await productCollections.findOne(query);
       res.send(result);
     });
@@ -124,6 +123,27 @@ async function run() {
       }
       const cursor = bidsCollections.find(query);
       const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/products/bids/:productId", async (req, res) => {
+      const productId = req.params.productId;
+      const query = { product: productId };
+      const cursor = bidsCollections.find(query).sort({ bid_price: -1 });
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.post("/bids", async (req, res) => {
+      const newBids = req.body;
+      const result = await bidsCollections.insertOne(newBids);
+      res.send(result);
+    });
+
+    app.delete("/bids/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await bidsCollections.deleteOne(query);
       res.send(result);
     });
 

@@ -1,11 +1,12 @@
 import React from "react";
+import { Link } from "react-router";
 
 const ProductCard = ({ product }) => {
-  const { title, price_min, price_max, image } = product;
+  const { _id, title, price_min, price_max, image } = product;
   return (
     <div className="card bg-base-100  shadow-sm">
       <figure className="px-4 pt-4">
-        <img src={image} alt={title} className="rounded-xl w-full md:h-50" />
+        <img src={image} alt={title} className="rounded-xl w-full " />
       </figure>
       <div className="card-body ">
         <h2 className="card-title">{title}</h2>
@@ -13,7 +14,12 @@ const ProductCard = ({ product }) => {
           Price: {price_min} - {price_max}
         </p>
         <div className="card-actions">
-          <button className="btn btn-primary w-full">View Details</button>
+          <Link
+            to={`/product-details/${_id}`}
+            className="btn btn-primary w-full"
+          >
+            View Details
+          </Link>
         </div>
       </div>
     </div>

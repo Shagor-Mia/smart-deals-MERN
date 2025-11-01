@@ -45,6 +45,8 @@ let router = createBrowserRouter([
       },
       {
         path: "/product-details/:id",
+        loader: ({ params }) =>
+          fetch(`http://localhost:4000/products/${params.id}`),
         Component: ProductDetails,
       },
     ],

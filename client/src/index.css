@@ -6,7 +6,7 @@
   name: "light";
   default: true;
   --color-primary: #632ee3;
-  --color-secondary: teal;
+  --color-secondary: #9f62f2;
 }
 
 /* Override DaisyUI btn-primary */
