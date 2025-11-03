@@ -21,6 +21,18 @@ app.use(cors());
 app.use(express.json());
 const port = process.env.PORT || 4000;
 
+const verifyFireBaseToken = (req, res, next) => {
+  const headers = req.headers.authorization;
+  if (!headers) {
+    return res.status(401).send({ message: `unauthorize access` });
+  }
+  const token = headers.split(" ")[1];
+  if (!token) {
+    return res.status(401).send({ message: `token not found!` });
+  }
+  next();
+};
+
 app.get("/", (req, res) => {
   res.send("Programming hero backend!");
 });
@@ -115,7 +127,8 @@ async function run() {
     });
 
     // bids
-    app.get("/bids", async (req, res) => {
+    app.get("/bids", verifyFireBaseToken, async (req, res) => {
+      // console.log(`token`, req.headers);
       const email = req.query.email;
       const query = {};
       if (email) {

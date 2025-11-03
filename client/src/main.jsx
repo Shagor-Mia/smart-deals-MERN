@@ -13,6 +13,8 @@ import MyBids from "./components/MyBids.jsx";
 import MyProducts from "./components/MyProducts.jsx";
 import Login from "./components/Login.jsx";
 import ProductDetails from "./components/ProductDetails.jsx";
+import CreateProduct from "./components/Seller/CreateProduct.jsx";
+import PrivateRoute from "./context/PrivateRoute.jsx";
 
 let router = createBrowserRouter([
   {
@@ -37,11 +39,23 @@ let router = createBrowserRouter([
       },
       {
         path: "/my-bids",
-        Component: MyBids,
+        element: (
+          <PrivateRoute>
+            <MyBids />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/my-products",
-        Component: MyProducts,
+        element: (
+          <PrivateRoute>
+            <MyProducts />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/create-product",
+        Component: CreateProduct,
       },
       {
         path: "/product-details/:id",
