@@ -57,7 +57,11 @@ const ProductDetails = () => {
   };
 
   useEffect(() => {
-    fetch(`http://localhost:4000/products/bids/${_id}`)
+    fetch(`http://localhost:4000/products/bids/${_id}`, {
+      headers: {
+        authorization: `Bearer ${user.accessToken}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         console.log("data after bids", data);

@@ -22,7 +22,7 @@ const MyBids = () => {
           setBids(data);
         });
     }
-  }, [user?.email]);
+  }, [user]);
 
   const handleDeleteBid = (_id) => {
     Swal.fire({

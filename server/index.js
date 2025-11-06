@@ -44,7 +44,8 @@ const verifyFireBaseToken = async (req, res, next) => {
   }
   // verify token
   try {
-    const tokenInfo = await admin.auth().verifyIdToken(token);
+    const userInfo = await admin.auth().verifyIdToken(token);
+    req.token_email = userInfo.email;
     // console.log(`after token validation:`, tokenInfo);
     next();
   } catch {
@@ -162,13 +163,17 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/products/bids/:productId", async (req, res) => {
-      const productId = req.params.productId;
-      const query = { product: productId };
-      const cursor = bidsCollections.find(query).sort({ bid_price: -1 });
-      const result = await cursor.toArray();
-      res.send(result);
-    });
+    app.get(
+      "/products/bids/:productId",
+      verifyFireBaseToken,
+      async (req, res) => {
+        const productId = req.params.productId;
+        const query = { product: productId };
+        const cursor = bidsCollections.find(query).sort({ bid_price: -1 });
+        const result = await cursor.toArray();
+        res.send(result);
+      }
+    );
 
     app.post("/bids", async (req, res) => {
       const newBids = req.body;
