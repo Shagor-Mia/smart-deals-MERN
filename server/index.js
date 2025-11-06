@@ -2,9 +2,21 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
+import admin from "firebase-admin";
+import fs from "fs";
+
+const serviceAccount = JSON.parse(
+  fs.readFileSync("./smart-deals-firebase-adminsdk.json", "utf8")
+);
+
 const app = express();
 
 // TVAX4rBHFLzodpC9
+
+// firebase SDK
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 const uri = process.env.URL;
 
@@ -21,7 +33,7 @@ app.use(cors());
 app.use(express.json());
 const port = process.env.PORT || 4000;
 
-const verifyFireBaseToken = (req, res, next) => {
+const verifyFireBaseToken = async (req, res, next) => {
   const headers = req.headers.authorization;
   if (!headers) {
     return res.status(401).send({ message: `unauthorize access` });
@@ -30,7 +42,14 @@ const verifyFireBaseToken = (req, res, next) => {
   if (!token) {
     return res.status(401).send({ message: `token not found!` });
   }
-  next();
+  // verify token
+  try {
+    const tokenInfo = await admin.auth().verifyIdToken(token);
+    // console.log(`after token validation:`, tokenInfo);
+    next();
+  } catch {
+    return res.status(401).send({ message: `not validate token!` });
+  }
 };
 
 app.get("/", (req, res) => {
@@ -128,10 +147,14 @@ async function run() {
 
     // bids
     app.get("/bids", verifyFireBaseToken, async (req, res) => {
-      // console.log(`token`, req.headers);
+      // console.log(`token email`, req);
       const email = req.query.email;
+      console.log(email);
       const query = {};
       if (email) {
+        if (email !== req.token_email) {
+          return res.status(403).send({ message: `forbidden access` });
+        }
         query.buyer_email = email;
       }
       const cursor = bidsCollections.find(query);
