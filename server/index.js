@@ -4,6 +4,7 @@ import "dotenv/config";
 import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
 import admin from "firebase-admin";
 import fs from "fs";
+import jwt from "jsonwebtoken";
 
 const serviceAccount = JSON.parse(
   fs.readFileSync("./smart-deals-firebase-adminsdk.json", "utf8")
@@ -33,23 +34,49 @@ app.use(cors());
 app.use(express.json());
 const port = process.env.PORT || 4000;
 
+// verifyFireBaseToken
 const verifyFireBaseToken = async (req, res, next) => {
-  const headers = req.headers.authorization;
-  if (!headers) {
+  const headerAuthorization = req.headers.authorization;
+  if (!headerAuthorization) {
     return res.status(401).send({ message: `unauthorize access` });
   }
-  const token = headers.split(" ")[1];
+  const token = headerAuthorization.split(" ")[1];
   if (!token) {
     return res.status(401).send({ message: `token not found!` });
   }
   // verify token
   try {
-    const userInfo = await admin.auth().verifyIdToken(token);
-    req.token_email = userInfo.email;
+    const decoded = await admin.auth().verifyIdToken(token);
+    req.token_email = decoded.email;
     // console.log(`after token validation:`, tokenInfo);
     next();
   } catch {
     return res.status(401).send({ message: `not validate token!` });
+  }
+};
+
+// verify local storage token
+const localStorageToken = async (req, res, next) => {
+  const authorization = req.headers.authorization;
+  if (!authorization) {
+    return res.status(401).send({ message: `unauthorize access for local` });
+  }
+  const localToken = authorization.split(" ")[1];
+  if (!localToken) {
+    return res.status(401).send({ message: `local token not found!` });
+  }
+  // verify
+  try {
+    jwt.verify(localToken, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        return res.status(401).send({ message: "unauthorize token!" });
+      }
+      // console.log("after decoded:", decoded);
+      req.token_email = decoded.email;
+      next();
+    });
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -66,6 +93,15 @@ async function run() {
     const productCollections = db.collection("Products");
     const bidsCollections = db.collection("bids");
     const usersCollections = db.collection("Users");
+
+    // custom jwt
+    app.post("/getToken", (req, res) => {
+      const loggedUser = req.body;
+      const token = jwt.sign(loggedUser, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+      res.send({ token: token });
+    });
 
     // users
     app.post("/users", async (req, res) => {
@@ -146,22 +182,38 @@ async function run() {
       res.send(result);
     });
 
-    // bids
-    app.get("/bids", verifyFireBaseToken, async (req, res) => {
-      // console.log(`token email`, req);
+    // local storage token
+    app.get("/bids", localStorageToken, async (req, res) => {
       const email = req.query.email;
-      console.log(email);
+      // console.log(req.headers);
       const query = {};
       if (email) {
-        if (email !== req.token_email) {
-          return res.status(403).send({ message: `forbidden access` });
-        }
         query.buyer_email = email;
+      }
+      if (email !== req.token_email) {
+        return res.status(403).send({ message: "forbidden access" });
       }
       const cursor = bidsCollections.find(query);
       const result = await cursor.toArray();
       res.send(result);
     });
+
+    // bids with firebase token verify
+    // app.get("/bids", verifyFireBaseToken, async (req, res) => {
+    //   // console.log(`token email`, req);
+    //   const email = req.query.email;
+    //   console.log(email);
+    //   const query = {};
+    //   if (email) {
+    //     if (email !== req.token_email) {
+    //       return res.status(403).send({ message: `forbidden access` });
+    //     }
+    //     query.buyer_email = email;
+    //   }
+    //   const cursor = bidsCollections.find(query);
+    //   const result = await cursor.toArray();
+    //   res.send(result);
+    // });
 
     app.get(
       "/products/bids/:productId",
