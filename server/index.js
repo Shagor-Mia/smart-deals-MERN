@@ -6,9 +6,12 @@ import admin from "firebase-admin";
 import fs from "fs";
 import jwt from "jsonwebtoken";
 
-const serviceAccount = JSON.parse(
-  fs.readFileSync("./smart-deals-firebase-adminsdk.json", "utf8")
-);
+// for vercel
+const decoded = Buffer.from(
+  process.env.FIREBASE_SERVICE_KEY,
+  "base64"
+).toString("utf8");
+const serviceAccount = JSON.parse(decoded);
 
 const app = express();
 
@@ -20,6 +23,7 @@ admin.initializeApp({
 });
 
 const uri = process.env.URL;
+console.log(uri);
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -88,7 +92,7 @@ app.get("/", (req, res) => {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     const db = client.db("smart-dealsDB");
     const productCollections = db.collection("Products");
     const bidsCollections = db.collection("bids");
@@ -247,7 +251,7 @@ async function run() {
     });
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
