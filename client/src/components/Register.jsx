@@ -13,7 +13,7 @@ const Register = () => {
           email: result.user.email,
           image: result.user.photoURL,
         };
-        fetch("http://localhost:4000/users", {
+        fetch("https://smart-deals-ph-server.vercel.app/users", {
           method: "POST",
           headers: {
             "content-type": "application/json",

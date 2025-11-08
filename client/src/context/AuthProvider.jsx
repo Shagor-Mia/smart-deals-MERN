@@ -41,7 +41,7 @@ const AuthProvider = ({ children }) => {
       console.log(`current user:`, currentUser);
       if (currentUser) {
         const loggedUser = { email: currentUser.email };
-        fetch("http://localhost:4000/getToken", {
+        fetch("https://smart-deals-ph-server.vercel.app/getToken", {
           method: "POST",
           headers: {
             "content-type": "application/json",

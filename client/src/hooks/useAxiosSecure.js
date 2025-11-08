@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
 const instance = axios.create({
-  baseURL: "http://localhost:4000",
+  baseURL: "https://smart-deals-ph-server.vercel.app",
 });
 
 export const useAxiosSecure = () => {

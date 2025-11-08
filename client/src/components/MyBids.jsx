@@ -13,7 +13,7 @@ const MyBids = () => {
 
   // useEffect(() => {
   //   if (user?.email) {
-  //     fetch(`http://localhost:4000/bids?email=${user?.email}`, {
+  //     fetch(`https://smart-deals-ph-server.vercel.app/bids?email=${user?.email}`, {
   //       headers: {
   //         authorization: `Bearer ${localStorage.getItem("authToken")}`,
   //       },
@@ -38,7 +38,7 @@ const MyBids = () => {
 
   // useEffect(() => {
   //   if (user?.email) {
-  //     fetch(`http://localhost:4000/bids?email=${user?.email}`, {
+  //     fetch(`https://smart-deals-ph-server.vercel.app/bids?email=${user?.email}`, {
   //       headers: {
   //         authorization: `Bearer ${user.accessToken}`,
   //       },
@@ -62,7 +62,9 @@ const MyBids = () => {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`http://localhost:4000/bids/${_id}`, { method: "DELETE" })
+        fetch(`https://smart-deals-ph-server.vercel.app/bids/${_id}`, {
+          method: "DELETE",
+        })
           .then((res) => res.json())
           .then((data) => {
             if (data.deletedCount) {

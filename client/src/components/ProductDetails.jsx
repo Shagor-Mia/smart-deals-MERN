@@ -32,7 +32,7 @@ const ProductDetails = () => {
       status: "pending",
     };
 
-    fetch(`http://localhost:4000/bids`, {
+    fetch(`https://smart-deals-ph-server.vercel.app/bids`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(newBid),
@@ -59,15 +59,17 @@ const ProductDetails = () => {
 
   // axios()
   useEffect(() => {
-    axios.get(`http://localhost:4000/products/bids/${_id}`).then((resData) => {
-      console.log(resData);
-      setBids(resData.data);
-    });
+    axios
+      .get(`https://smart-deals-ph-server.vercel.app/products/bids/${_id}`)
+      .then((resData) => {
+        console.log(resData);
+        setBids(resData.data);
+      });
   }, [_id]);
 
   // fetch()
   // useEffect(() => {
-  //   fetch(`http://localhost:4000/products/bids/${_id}`, {
+  //   fetch(`https://smart-deals-ph-server.vercel.app/products/bids/${_id}`, {
   //     headers: {
   //       authorization: `Bearer ${user.accessToken}`,
   //     },
