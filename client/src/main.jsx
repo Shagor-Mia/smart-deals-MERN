@@ -55,7 +55,11 @@ let router = createBrowserRouter([
       },
       {
         path: "/create-product",
-        Component: CreateProduct,
+        element: (
+          <PrivateRoute>
+            <CreateProduct />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/product-details/:id",

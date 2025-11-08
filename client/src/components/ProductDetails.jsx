@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
 import { useState } from "react";
+import axios from "axios";
 
 const ProductDetails = () => {
   const { user } = use(AuthContext);
@@ -56,18 +57,27 @@ const ProductDetails = () => {
       });
   };
 
+  // axios()
   useEffect(() => {
-    fetch(`http://localhost:4000/products/bids/${_id}`, {
-      headers: {
-        authorization: `Bearer ${user.accessToken}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("data after bids", data);
-        setBids(data);
-      });
+    axios.get(`http://localhost:4000/products/bids/${_id}`).then((resData) => {
+      console.log(resData);
+      setBids(resData.data);
+    });
   }, [_id]);
+
+  // fetch()
+  // useEffect(() => {
+  //   fetch(`http://localhost:4000/products/bids/${_id}`, {
+  //     headers: {
+  //       authorization: `Bearer ${user.accessToken}`,
+  //     },
+  //   })
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       console.log("data after bids", data);
+  //       setBids(data);
+  //     });
+  // }, [_id]);
 
   return (
     <div>
@@ -116,7 +126,7 @@ const ProductDetails = () => {
                   />
 
                   <button type="submit" className="btn btn-neutral mt-4">
-                    Login
+                    submit
                   </button>
                 </fieldset>
               </form>
@@ -150,7 +160,7 @@ const ProductDetails = () => {
             </thead>
             <tbody>
               {bids.map((bid, index) => (
-                <tr>
+                <tr key={index}>
                   <th>{index + 1}</th>
                   <td>
                     <div className="flex items-center gap-3">

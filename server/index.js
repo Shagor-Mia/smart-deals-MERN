@@ -154,7 +154,8 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/products", async (req, res) => {
+    app.post("/products", verifyFireBaseToken, async (req, res) => {
+      console.log(`headers after post`, req.headers);
       const newProduct = req.body;
       const result = await productCollections.insertOne(newProduct);
       res.send(result);
@@ -183,20 +184,25 @@ async function run() {
     });
 
     // local storage token
-    app.get("/bids", localStorageToken, async (req, res) => {
-      const email = req.query.email;
-      // console.log(req.headers);
-      const query = {};
-      if (email) {
-        query.buyer_email = email;
+    app.get(
+      "/bids",
+      // localStorageToken,
+      verifyFireBaseToken,
+      async (req, res) => {
+        const email = req.query.email;
+        // console.log(req.headers);
+        const query = {};
+        if (email) {
+          query.buyer_email = email;
+        }
+        if (email !== req.token_email) {
+          return res.status(403).send({ message: "forbidden access" });
+        }
+        const cursor = bidsCollections.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
       }
-      if (email !== req.token_email) {
-        return res.status(403).send({ message: "forbidden access" });
-      }
-      const cursor = bidsCollections.find(query);
-      const result = await cursor.toArray();
-      res.send(result);
-    });
+    );
 
     // bids with firebase token verify
     // app.get("/bids", verifyFireBaseToken, async (req, res) => {
@@ -217,7 +223,7 @@ async function run() {
 
     app.get(
       "/products/bids/:productId",
-      verifyFireBaseToken,
+      // verifyFireBaseToken,
       async (req, res) => {
         const productId = req.params.productId;
         const query = { product: productId };

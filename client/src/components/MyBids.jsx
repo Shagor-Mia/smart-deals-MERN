@@ -4,25 +4,37 @@ import { AuthContext } from "../context/AuthContext";
 import { useEffect } from "react";
 import { useState } from "react";
 import Swal from "sweetalert2";
+import { useAxiosSecure } from "../hooks/useAxiosSecure";
 
 const MyBids = () => {
   const { user } = use(AuthContext);
   const [bids, setBids] = useState([]);
+  const secureAxios = useAxiosSecure();
+
+  // useEffect(() => {
+  //   if (user?.email) {
+  //     fetch(`http://localhost:4000/bids?email=${user?.email}`, {
+  //       headers: {
+  //         authorization: `Bearer ${localStorage.getItem("authToken")}`,
+  //       },
+  //     })
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         console.log(data);
+  //         setBids(data);
+  //       });
+  //   }
+  // }, [user]);
+
+  //
+  //
 
   useEffect(() => {
-    if (user?.email) {
-      fetch(`http://localhost:4000/bids?email=${user?.email}`, {
-        headers: {
-          authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          setBids(data);
-        });
-    }
-  }, [user]);
+    secureAxios.get(`/bids?email=${user.email}`).then((resData) => {
+      console.log(resData.data);
+      setBids(resData.data);
+    });
+  }, [user, secureAxios]);
 
   // useEffect(() => {
   //   if (user?.email) {
@@ -84,7 +96,7 @@ const MyBids = () => {
           </thead>
           <tbody>
             {bids.map((bid, index) => (
-              <tr>
+              <tr key={index}>
                 <th>{index + 1}</th>
                 <td>
                   <div className="flex items-center gap-3">
